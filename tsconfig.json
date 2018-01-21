@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "module": "commonjs",
+        "target": "es6",
+        "lib": [
+            "es2015", "dom"
+        ],
+        "importHelpers": true,
+        "noEmitHelpers": true,
+        "noImplicitAny": true,
+        "preserveConstEnums": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "sourceMap": true,
+        "allowJs": true,
+        "baseUrl": "./src",
+        "paths": {
+            "tslib": [ "node_modules/tslib/tslib.d.ts" ]
+        }
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
