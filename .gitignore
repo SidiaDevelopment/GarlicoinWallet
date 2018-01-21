@@ -1,5 +1,5 @@
 app/
+!app/main.js
 node_modules/
 font/
 img/
-!app/main.js
