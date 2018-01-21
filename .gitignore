@@ -2,3 +2,4 @@ app/
 node_modules/
 font/
 img/
+!app/main.js
