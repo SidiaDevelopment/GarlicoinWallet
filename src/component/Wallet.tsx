@@ -2,13 +2,18 @@ import * as React from "react";
 
 import { notification } from 'antd';
 
-import GarlicoinApi from './../service/GarlicoinApi';
+import GarlicoinApi from '../service/GarlicoinApi';
+import {TApiResponse} from "../service/GarlicoinApi";
 
 interface TWalletProps {}
 interface TWalletState {
     balance: number;
 }
 
+/**
+ * Main wallet
+ * - Shows Balance
+ */
 class Wallet extends React.Component<TWalletProps, TWalletState> {
     private mounted = false;
 
@@ -19,16 +24,27 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
         }
     }
 
+    /**
+     * Enable asnyc api calls state changes
+     */
     componentDidMount() {
         this.mounted = true;
         this.fetchWalletBalance();
     }
 
+    /**
+     * Prevent this.state after unmounting from async api calls
+     */
     componentWillUnmount() {
         this.mounted = false;
     }
 
-    render() {
+    /**
+     * Rendering
+     *
+     * @returns {any}
+     */
+    render(): JSX.Element {
         return (
             <div>
                 Your wallet contains { this.getWalletBalance() }
@@ -36,26 +52,42 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
         );
     }
 
-    fetchWalletBalance() {
-        let api = new GarlicoinApi();
+    /**
+     * Start getBalance call
+     */
+    fetchWalletBalance(): void {
+        let api = GarlicoinApi.getInstance();
         api.getBalance(this.fetchedWalletBalance)
     }
 
-    fetchedWalletBalance = (_err: string, _data: any) => {
-        if (_err != null) {
-            console.log(_err);
+    /**
+     * Callback for getBalance call
+     *
+     * @param {TApiResponse} response
+     */
+    fetchedWalletBalance = (response: TApiResponse) => {
+        if (response.getError() != null) {
+            console.log(response.getError());
         } else {
             if (this.mounted) {
-                this.setState({balance: _data.toString()});
+                this.setState({balance: response.getData().toString()});
             }
-            notification.open({
-                message: 'New balance fetched',
-                description: _data.toString(),
-            });
+            if (!response.wasCached()) {
+                notification.open({
+                    message: 'New balance fetched',
+                    description: response.getData().toString(),
+                    placement: "bottomRight"
+                });
+            }
         }
     };
 
-    getWalletBalance() {
+    /**
+     * Format current balance
+     *
+     * @returns {string}
+     */
+    getWalletBalance(): string {
         if (this.state.balance !== -1) {
             return this.state.balance + " Garlicoins";
         } else {

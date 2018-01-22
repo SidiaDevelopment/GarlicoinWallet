@@ -13,6 +13,10 @@ interface TSidiaState {
     content: string;
 }
 
+interface TElements {
+    [key: string]: any
+}
+
 
 class App extends React.Component<TSidiaProps, TSidiaState> {
     constructor(props: TSidiaProps) {
@@ -39,16 +43,16 @@ class App extends React.Component<TSidiaProps, TSidiaState> {
     }
 
     get contentDisplay() {
-        let element = <Wallet />;
+        let elements: TElements = {
+            wallet: <Wallet/>,
+            send: <Send/>
+        };
 
-        switch(this.state.content) {
-            case "wallet":
-                element = <Wallet />;
-                break;
-            case "send":
-                element = <Send />
+        if (elements.hasOwnProperty(this.state.content)) {
+            return elements[this.state.content];
+        } else {
+            return elements.wallet;
         }
-        return element;
     }
 
     render() {
@@ -59,19 +63,18 @@ class App extends React.Component<TSidiaProps, TSidiaState> {
                 collapsed={this.state.collapsed}
                 className="layout__navbar"
             >
-                <div className="logo"/>
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onSelect={this.menuSelect}>
+                <div className="logo">
+                    <img src={this.state.collapsed ? "app/img/logo-small.png" : "app/img/logo-full.png"}
+                         onClick={() => this.setState({content: 'wallet'})} />
+                </div>
+                <Menu theme="dark" mode="inline" key={this.state.content} onSelect={this.menuSelect}>
                     <Menu.Item key="wallet">
-                        <Icon type="user"/>
-                        <span>nav 1</span>
-                    </Menu.Item>
-                    <Menu.Item key="send">
-                        <Icon type="video-camera"/>
+                        <Icon type="wallet"/>
                         <span>Wallet</span>
                     </Menu.Item>
-                    <Menu.Item key="3">
-                        <Icon type="upload"/>
-                        <span>nav 3</span>
+                    <Menu.Item key="send">
+                        <Icon type="logout"/>
+                        <span>Send coins</span>
                     </Menu.Item>
                 </Menu>
             </Sider>
