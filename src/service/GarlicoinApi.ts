@@ -32,8 +32,7 @@ interface TCache {
  */
 interface TCacheEntry {
     timestamp: number;
-    data: any;
-    err: string
+    response: TApiResponse;
 }
 
 /**
@@ -95,7 +94,7 @@ class GarlicoinApi {
             let lastCacheEntry: TCacheEntry | boolean;
             if ((lastCacheEntry = this.cacheGet(_command, _cacheTime)) !== false) {
                 // Cache exists, use cache
-                let response: TApiResponse = this.prepareResponse((<TCacheEntry>lastCacheEntry).err, (<TCacheEntry>lastCacheEntry).data, true);
+                let response: TApiResponse = (<TCacheEntry>lastCacheEntry).response;
                 _callback(response);
                 return;
             }
@@ -159,9 +158,9 @@ class GarlicoinApi {
      */
     encapsulatedCacheCallback(_command: string, _originalCallback: TResponseCallback): TCallback {
         return (_err: string, _data: any): void => {
-            this.cacheSave(_command, _err, _data);
-
             let response: TApiResponse = this.prepareResponse(_err, _data);
+
+            this.cacheSave(_command, response);
             _originalCallback(response);
         }
     }
@@ -170,19 +169,17 @@ class GarlicoinApi {
      * Saves the current request to cache
      *
      * @param {string} _command
-     * @param {string} _err
-     * @param _data
+     * @param _response
      */
-    cacheSave(_command: string, _err: string, _data: any): void {
-        if (_err != null) {
+    cacheSave(_command: string, _response: TApiResponse): void {
+        if (_response.getError() != null) {
             return;
         }
 
         let timestamp = new Date().getTime() / 1000;
         this.cache[_command] = {
             timestamp: timestamp,
-            data: _data,
-            err: null
+            response: _response
         };
     }
 
@@ -194,10 +191,7 @@ class GarlicoinApi {
      * @returns {TCacheEntry | boolean}
      */
     cacheGet(_command: string, _cacheTime: number): TCacheEntry | boolean{
-        console.log(this.cache);
-
         if (this.cache.hasOwnProperty(_command)) {
-            console.log('test');
             let timestamp = new Date().getTime() / 1000;
             if (this.cache[_command].timestamp > timestamp - _cacheTime) {
                 return this.cache[_command];
