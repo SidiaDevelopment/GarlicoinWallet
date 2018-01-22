@@ -29,7 +29,7 @@ class TransactionModalContent extends React.Component<TTransactionModalContentPr
         }
         let dataSource: TTransactionDetailListItem[] = [
             {
-                title: 'Receiver',
+                title: 'Address',
                 description: this.props.data.address,
                 icon: 'user'
             },
