@@ -67,7 +67,7 @@ class App extends React.Component<TSidiaProps, TSidiaState> {
                     <img src={this.state.collapsed ? "app/img/logo-small.png" : "app/img/logo-full.png"}
                          onClick={() => this.setState({content: 'wallet'})} />
                 </div>
-                <Menu theme="dark" mode="inline" key={this.state.content} onSelect={this.menuSelect}>
+                <Menu theme="dark" mode="inline" defaultSelectedKeys={['wallet']} onSelect={this.menuSelect}>
                     <Menu.Item key="wallet">
                         <Icon type="wallet"/>
                         <span>Wallet</span>

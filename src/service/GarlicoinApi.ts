@@ -46,6 +46,7 @@ export interface TApiResponse {
     getData(): any;
     getError(): string;
     wasCached(): boolean;
+    setCached(): void;
 }
 
 /**
@@ -95,6 +96,9 @@ class GarlicoinApi {
             if ((lastCacheEntry = this.cacheGet(_command, _cacheTime)) !== false) {
                 // Cache exists, use cache
                 let response: TApiResponse = (<TCacheEntry>lastCacheEntry).response;
+
+                response.setCached();
+
                 _callback(response);
                 return;
             }
@@ -131,6 +135,10 @@ class GarlicoinApi {
 
             wasCached() {
                 return this.cached
+            },
+
+            setCached() {
+                this.cached = true;
             }
         };
     }
