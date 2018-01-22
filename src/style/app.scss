@@ -3,5 +3,6 @@
 * {
 	-webkit-app-region: no-drag;
 }
-
+::-webkit-scrollbar { display: none; }
 @import 'Layout';
+@import 'Wallet';

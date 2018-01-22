@@ -79,7 +79,7 @@ class App extends React.Component<TAppProps, TAppState> {
                 </Menu>
             </Sider>
             <Layout>
-                <Header className="layout__header" style={{background: '#fff', padding: 0}}>
+                <Header className="layout__header" style={{ background: '#fff', padding: 0 }}>
                     <Icon
                         className="trigger"
                         type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
@@ -91,7 +91,7 @@ class App extends React.Component<TAppProps, TAppState> {
                         onClick={this.close}
                     />
                 </Header>
-                <Content style={{margin: '24px 16px', padding: 24, background: '#fff', minHeight: 488}}>
+                <Content style={{margin: '24px 16px', padding: 24, background: '#fff'}}>
                     { this.contentDisplay }
                 </Content>
             </Layout>

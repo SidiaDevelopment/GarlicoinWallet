@@ -1,0 +1,27 @@
+#wallet {
+	.balance {
+		display: block;
+
+		font-size: 40px;
+		text-align: center;
+	}
+	.options {
+		text-align: center;
+	}
+	.transactions {
+		.negative {
+			background-color: lighten(#ffa39e, 15%);
+		}
+		.positive {
+			background-color: lighten(#b7eb8f, 20%);
+		}
+	}
+
+}
+.transactionmodal {
+	.detaillist {
+		.anticon {
+			font-size: 40px;
+		}
+	}
+}

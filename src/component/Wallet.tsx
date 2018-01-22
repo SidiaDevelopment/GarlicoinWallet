@@ -2,12 +2,24 @@ import * as React from "react";
 
 import { notification } from 'antd';
 
-import GarlicoinApi from '../service/GarlicoinApi';
-import {TApiResponse} from "../service/GarlicoinApi";
+import GarlicoinApi, {TTransaction, TApiResponse, TTransactionData} from '../service/GarlicoinApi';
+import Spin from "antd/lib/spin";
+import Icon from "antd/lib/icon";
+import Row from 'antd/lib/grid/row';
+import Col from "antd/lib/grid/col";
+import Divider from "antd/lib/divider";
+import Table from "antd/lib/table/Table";
+import Steps from "antd/lib/steps";
+import TransactionModalContent from "./TransactionModalContent";
+import Modal from "antd/lib/modal/Modal";
+import Button from "antd/lib/button/button";
+const Step = Steps.Step;
 
 interface TWalletProps {}
 interface TWalletState {
     balance: number;
+    transactions: TTransaction[];
+    transactionModalDataSet: TTransaction;
 }
 
 /**
@@ -21,6 +33,8 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
         super(props);
         this.state = {
             balance: -1,
+            transactions: [],
+            transactionModalDataSet: null
         }
     }
 
@@ -46,10 +60,70 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
      */
     render(): JSX.Element {
         return (
-            <div>
-                Your wallet contains { this.getWalletBalance() }
+            <div id="wallet">
+                <Divider>Garlicoin Balance</Divider>
+                <Row className="balance">
+                    <Col span={24}>{ this.getWalletBalance() }</Col>
+                </Row>
+                <Divider>Transactions</Divider>
+                <Row className="transactions">
+                    { this.getTransactionList() }
+                </Row>
             </div>
+
         );
+    }
+
+    getTransactionList(): JSX.Element {
+        return this.getTransactionTable(this.state.transactions.length <= 0);
+    }
+
+    getTransactionTable(loading: boolean = false): JSX.Element {
+        const columns = [
+            {
+                title: 'Amount',
+                dataIndex: 'amount',
+                key: 'amount',
+            },
+            {
+                title: 'TXID',
+                dataIndex: 'txid',
+                key: 'txid',
+            },
+            {
+                title: 'Options',
+                key: 'option',
+                render: (_text: string, _record: TTransaction): JSX.Element => {
+                    return <div>
+                        <Button type="primary" onClick={(e: any) => this.openTransactionModal(_record)}><Icon type="eye" /></Button>
+                    </div>;
+                }
+            }
+        ];
+        return <div>
+            <Table dataSource={this.state.transactions}
+                   rowClassName={(record: TTransaction) => record.amount > 0 ? 'positive' : 'negative'}
+                   expandIconAsCell={false}
+                   columns={columns}
+                   size="middle"
+                   pagination={{pageSize: 5}}
+                   loading={loading}
+            />
+            <Modal visible={this.state.transactionModalDataSet !== null}
+                   onCancel={this.handleModalClose}
+                   footer={null}
+                   className="transactionmodal"
+                   width={800}>
+                <TransactionModalContent data={this.state.transactionModalDataSet} verifiedAfter={1000} />
+            </Modal>
+        </div>;
+    }
+
+    handleModalClose = () => {
+        this.setState({transactionModalDataSet: null})
+    }
+    openTransactionModal = (_record: TTransaction) => {
+        this.setState({transactionModalDataSet: _record})
     }
 
     /**
@@ -80,6 +154,40 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
                 });
             }
         }
+        this.fetchTransactions();
+    };
+
+    fetchTransactions() {
+        let api = GarlicoinApi.getInstance();
+        api.getTransactions(100, this.fetchedTransactions)
+    }
+
+    fetchedTransactions = (response: TApiResponse) => {
+        let transactions: TTransactionData[] = [];
+        let transactionsJson: any[] = [];
+
+        transactionsJson = transactionsJson.concat(response.getJson());
+        transactionsJson.map((_transaction: any, _index: number) => {
+            transactions.push({
+                key: _index,
+                account: _transaction.account,
+                address: _transaction.address,
+                category: _transaction.category,
+                amount: _transaction.amount,
+                label: _transaction.label,
+                vout: _transaction.vout,
+                confirmations: _transaction.confirmations,
+                blockhash: _transaction.blockhash,
+                blockindex: _transaction.blockindex,
+                blocktime: _transaction.blocktime,
+                txid: _transaction.txid,
+                walletconflicts: _transaction.walletconflicts,
+                time: _transaction.time,
+                timereceived: _transaction.timereceived,
+            });
+        });
+        transactions = transactions.reverse();
+        this.setState({transactions});
     };
 
     /**
@@ -87,11 +195,12 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
      *
      * @returns {string}
      */
-    getWalletBalance(): string {
+    getWalletBalance(): string | JSX.Element {
         if (this.state.balance !== -1) {
-            return this.state.balance + " Garlicoins";
+            return this.state.balance + " GRLC";
         } else {
-            return "[loading...]"
+            const spinnerIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
+            return <Spin indicator={spinnerIcon} />
         }
     }
 }

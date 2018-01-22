@@ -47,6 +47,28 @@ export interface TApiResponse {
     getError(): string;
     wasCached(): boolean;
     setCached(): void;
+    getJson(): JSON;
+}
+
+export interface TTransaction {
+    account: string;
+    address: string;
+    category: string;
+    amount: number;
+    label: string;
+    vout: number;
+    confirmations: number;
+    blockhash: string;
+    blockindex: number;
+    blocktime: number;
+    txid: string;
+    walletconflicts: string[];
+    time: number;
+    timereceived: number;
+}
+
+export interface TTransactionData extends TTransaction {
+    key: number;
 }
 
 /**
@@ -79,7 +101,7 @@ class GarlicoinApi {
      * @param {TCallback} _callback
      * @param {number} _cacheTime
      */
-    call(_command: string, _parameters: ReadonlyArray<string>, _callback: TResponseCallback, _cacheTime: number = 0) {
+    call(_command: string, _parameters: ReadonlyArray<any>, _callback: TResponseCallback, _cacheTime: number = 0) {
         // Init garlicoin-cli
         let child = require('child_process').execFile;
         let executablePath = "garlicoin-cli.exe";
@@ -125,20 +147,24 @@ class GarlicoinApi {
             err: _err,
             cached: _cached,
 
-            getData() {
+            getData(): any {
                 return this.data;
             },
 
-            getError() {
+            getError(): string {
                 return this.err;
             },
 
-            wasCached() {
+            wasCached(): boolean {
                 return this.cached
             },
 
-            setCached() {
+            setCached(): void {
                 this.cached = true;
+            },
+
+            getJson(): JSON {
+                return JSON.parse(this.getData().toString())
             }
         };
     }
@@ -152,6 +178,10 @@ class GarlicoinApi {
      */
     public getBalance(_callback: TResponseCallback) {
         this.call("getbalance", [], _callback, 10);
+    }
+
+    public getTransactions(_count: number, _callback: TResponseCallback) {
+        this.call("listtransactions", ['*', _count], _callback, 60);
     }
 
 
