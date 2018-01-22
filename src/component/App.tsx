@@ -7,8 +7,8 @@ import Send from "./Send";
 
 const { Header, Sider, Content } = Layout;
 
-interface TSidiaProps {}
-interface TSidiaState {
+interface TAppProps {}
+interface TAppState {
     collapsed: boolean;
     content: string;
 }
@@ -18,8 +18,8 @@ interface TElements {
 }
 
 
-class App extends React.Component<TSidiaProps, TSidiaState> {
-    constructor(props: TSidiaProps) {
+class App extends React.Component<TAppProps, TAppState> {
+    constructor(props: TAppProps) {
         super(props);
         this.state = {
             collapsed: false,
