@@ -1,6 +1,6 @@
 class GarlicoinDate {
     public static formattedDate(timestamp: number): string {
-        let date: Date = new Date(timestamp);
+        let date: Date = new Date(timestamp * 1000);
         let dateString: string;
 
         dateString = date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear();

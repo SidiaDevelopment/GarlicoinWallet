@@ -1,11 +1,11 @@
 import * as React from "react";
 import {TTransaction} from "../service/GarlicoinApi";
-import Row from "antd/lib/grid/row";
-import Col from "antd/lib/grid/col";
+import {clipboard} from 'electron'
 import Badge from "antd/lib/badge";
-import { Steps, Icon } from 'antd';
+import { Steps, Icon, message } from 'antd';
 import Divider from "antd/lib/divider";
 import List from "antd/lib/list";
+import GarlicoinDate from "../service/GarlicoinDate";
 const Step = Steps.Step;
 
 interface TTransactionModalContentProps {
@@ -19,7 +19,8 @@ interface TTransactionModalContentState {
 interface TTransactionDetailListItem {
     title: string;
     description: string | JSX.Element;
-    icon: string
+    icon: string,
+    clipboard?: boolean;
 }
 
 class TransactionModalContent extends React.Component<TTransactionModalContentProps, TTransactionModalContentState>{
@@ -31,12 +32,14 @@ class TransactionModalContent extends React.Component<TTransactionModalContentPr
             {
                 title: 'Address',
                 description: this.props.data.address,
-                icon: 'user'
+                icon: 'user',
+                clipboard: true
             },
             {
                 title: 'Amount',
-                description: this.props.data.amount.toString() + " Garlicoins",
-                icon: 'area-chart'
+                description: this.props.data.amount.toString(),
+                icon: 'area-chart',
+                clipboard: true
             },
             {
                 title: 'Type',
@@ -51,11 +54,12 @@ class TransactionModalContent extends React.Component<TTransactionModalContentPr
             {
                 title: 'Blockhash',
                 description: this.props.data.blockhash,
-                icon: 'link'
+                icon: 'link',
+                clipboard: true
             },
             {
                 title: 'Time',
-                description: this.props.data.timereceived.toString(),
+                description: GarlicoinDate.formattedDate(this.props.data.timereceived),
                 icon: 'clock-circle-o'
             }
         ];
@@ -82,13 +86,23 @@ class TransactionModalContent extends React.Component<TTransactionModalContentPr
                             <List.Item.Meta
                                 avatar={<Icon type={item.icon}/>}
                                 title={item.title}
-                                description={item.description}
+                                description={this.concatItemDescription(item.description, item.clipboard)}
                             />
                         </List.Item>
                     }
                 }/>
             </div>
         );
+    }
+
+    concatItemDescription(_description: JSX.Element | string, _clipboard: boolean) {
+        return <span>
+            {_description}&nbsp;
+            {_clipboard && <a onClick={() => {
+                clipboard.writeText(_description as string);
+                message.success('Copied to clipboard');
+            }}><Icon style={{fontSize: 14}} type="paper-clip" /></a>}
+        </span>;
     }
 
     getConfirmationStatus(_confirmations: number): JSX.Element {

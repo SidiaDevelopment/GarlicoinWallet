@@ -106,7 +106,7 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
                    expandIconAsCell={false}
                    columns={columns}
                    size="middle"
-                   pagination={{pageSize: 5}}
+                   pagination={{pageSize: 7}}
                    loading={loading}
             />
             <Modal visible={this.state.transactionModalDataSet !== null}

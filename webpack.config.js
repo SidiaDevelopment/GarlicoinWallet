@@ -12,12 +12,12 @@ var isProd = false;
 var config = {
     devtool: isProd ? false : "source-map",
     entry: {
-        "app/garlic": "./src/app.tsx",
+        "client/garlic": "./src/app.tsx",
     },
     watchOptions: {
         aggregateTimeout: 300,
         poll: 1000,
-        ignored: ["node_modules/", "app/"]
+        ignored: ["node_modules/", "client/"]
     },
     resolve: {
         extensions: [".js", ".jsx", ".ts", ".tsx", ".scss", ".json"],
@@ -64,13 +64,13 @@ var config = {
         extractStyles,
 
         new webpack.optimize.CommonsChunkPlugin({
-            name: "app/vendors",
+            name: "client/vendors",
             minChunks: function(module){
                 return module.context && module.context.includes("node_modules");
             }
         }),
         new webpack.optimize.CommonsChunkPlugin({
-            name: "app/manifest"
+            name: "client/manifest"
         })
     ],
     output: {

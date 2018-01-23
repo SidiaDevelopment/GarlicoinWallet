@@ -1,5 +1,7 @@
-app/*
-!app/main.js
+client/
+!client/main.js
+!client/img
 node_modules/
 font/
 img/
+dist/

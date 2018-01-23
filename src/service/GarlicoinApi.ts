@@ -6,6 +6,7 @@
  * Garlicoin to the moon!
  */
 
+import { remote, app } from 'electron';
 /**
  * Callback with unformatted input
  */
@@ -104,7 +105,12 @@ class GarlicoinApi {
     call(_command: string, _parameters: ReadonlyArray<any>, _callback: TResponseCallback, _cacheTime: number = 0) {
         // Init garlicoin-cli
         let child = require('child_process').execFile;
-        let executablePath = "garlicoin-cli.exe";
+        let executablePath: string = "";
+
+        if(!remote.getGlobal('dev')) {
+            executablePath = "resources/";
+        }
+        executablePath += "garlicoin-cli.exe";
 
         // Initialise command parameters
         let parameters: Array<string> = [];

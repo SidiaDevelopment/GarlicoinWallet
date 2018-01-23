@@ -2,12 +2,13 @@
   "name": "GarlicoinWallet",
   "version": "0.0.2",
   "description": "Garlicoin Manager",
-  "main": "app/main.js",
+  "main": "client/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "dev": "webpack --watch",
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
   },
   "keywords": [
     "garlicoin",
@@ -22,7 +23,6 @@
     "antd": "^3.1.3",
     "awesome-typescript-loader": "^3.4.1",
     "css-loader": "^0.28.9",
-    "electron": "^1.7.10",
     "extract-text-webpack-plugin": "^3.0.2",
     "moment": "^2.20.1",
     "node-sass": "^4.7.2",
@@ -36,5 +36,33 @@
     "tslib": "^1.9.0",
     "typescript": "^2.6.2",
     "webpack": "^3.10.0"
+  },
+  "devDependencies": {
+    "electron": "^1.7.10",
+    "electron-builder": "^19.54.0"
+  },
+  "build": {
+    "asar": true,
+    "appId": "sidia.app",
+    "extraResources": "garlicoin-cli.exe",
+    "msi": {
+      "warningsAsErrors": false
+    },
+    "win": {
+      "target": [
+        {
+          "target": "msi",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/*",
+      "!src/*"
+    ]
   }
 }

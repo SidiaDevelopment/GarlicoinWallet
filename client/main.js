@@ -3,7 +3,7 @@ const path = require('path');
 const url = require('url');
 
 let win;
-const dev = true;
+const dev = false;
 
 global.dev = dev;
 
@@ -22,9 +22,8 @@ function createWindow () {
         slashes: true
     }));
 
-    if(dev) {
-        win.webContents.openDevTools();
-    }
+    win.webContents.openDevTools();
+
 
     win.on('closed', () => {
         win = null
