@@ -4,6 +4,7 @@ import { Layout, Menu, Icon } from 'antd';
 import { remote, BrowserWindow } from 'electron';
 import {SelectParam} from "antd/lib/menu";
 import Send from "./Send";
+import DevTools from "mobx-react-devtools";
 
 const { Header, Sider, Content } = Layout;
 
@@ -95,6 +96,7 @@ class App extends React.Component<TAppProps, TAppState> {
                     { this.contentDisplay }
                 </Content>
             </Layout>
+            <DevTools />
         </Layout>;
     }
 }

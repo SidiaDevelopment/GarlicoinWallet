@@ -13,11 +13,12 @@ import Steps from "antd/lib/steps";
 import TransactionModalContent from "./TransactionModalContent";
 import Modal from "antd/lib/modal/Modal";
 import Button from "antd/lib/button/button";
+import Balance from "./Balance";
+import BalanceStore from "../service/BalanceStore";
 const Step = Steps.Step;
 
 interface TWalletProps {}
 interface TWalletState {
-    balance: number;
     transactions: TTransaction[];
     transactionModalDataSet: TTransaction;
 }
@@ -27,15 +28,17 @@ interface TWalletState {
  * - Shows Balance
  */
 class Wallet extends React.Component<TWalletProps, TWalletState> {
-    private mounted = false;
+    private mounted: boolean = false;
+    balanceStore: BalanceStore;
 
     constructor(props: TWalletProps) {
         super(props);
         this.state = {
-            balance: -1,
             transactions: [],
             transactionModalDataSet: null
         }
+
+        this.balanceStore = new BalanceStore();
     }
 
     /**
@@ -43,7 +46,8 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
      */
     componentDidMount() {
         this.mounted = true;
-        this.fetchWalletBalance();
+        this.balanceStore.reloadBalance();
+        this.fetchTransactions();
     }
 
     /**
@@ -63,7 +67,7 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
             <div id="wallet">
                 <Divider>Garlicoin Balance</Divider>
                 <Row className="balance">
-                    <Col span={24}>{ this.getWalletBalance() }</Col>
+                    <Col span={24}><Balance balanceStore={this.balanceStore} /></Col>
                 </Row>
                 <Divider>Transactions</Divider>
                 <Row className="transactions">
@@ -126,37 +130,6 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
         this.setState({transactionModalDataSet: _record})
     }
 
-    /**
-     * Start getBalance call
-     */
-    fetchWalletBalance(): void {
-        let api = GarlicoinApi.getInstance();
-        api.getBalance(this.fetchedWalletBalance)
-    }
-
-    /**
-     * Callback for getBalance call
-     *
-     * @param {TApiResponse} response
-     */
-    fetchedWalletBalance = (response: TApiResponse) => {
-        if (response.getError() != null) {
-            console.log(response.getError());
-        } else {
-            if (this.mounted) {
-                this.setState({balance: response.getData().toString()});
-            }
-            if (!response.wasCached()) {
-                notification.open({
-                    message: 'New balance fetched',
-                    description: response.getData().toString(),
-                    placement: "bottomRight"
-                });
-            }
-        }
-        this.fetchTransactions();
-    };
-
     fetchTransactions() {
         let api = GarlicoinApi.getInstance();
         api.getTransactions(100, this.fetchedTransactions)
@@ -164,45 +137,17 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
 
     fetchedTransactions = (response: TApiResponse) => {
         let transactions: TTransactionData[] = [];
-        let transactionsJson: any[] = [];
-
-        transactionsJson = transactionsJson.concat(response.getJson());
-        transactionsJson.map((_transaction: any, _index: number) => {
-            transactions.push({
-                key: _index,
-                account: _transaction.account,
-                address: _transaction.address,
-                category: _transaction.category,
-                amount: _transaction.amount,
-                label: _transaction.label,
-                vout: _transaction.vout,
-                confirmations: _transaction.confirmations,
-                blockhash: _transaction.blockhash,
-                blockindex: _transaction.blockindex,
-                blocktime: _transaction.blocktime,
-                txid: _transaction.txid,
-                walletconflicts: _transaction.walletconflicts,
-                time: _transaction.time,
-                timereceived: _transaction.timereceived,
-            });
+        let key = 1;
+        transactions = transactions.concat(response.getJson() as any);
+        transactions = transactions.map((_value: TTransactionData) => {
+            _value.key = key++;
+            return _value;
         });
         transactions = transactions.reverse();
         this.setState({transactions});
     };
 
-    /**
-     * Format current balance
-     *
-     * @returns {string}
-     */
-    getWalletBalance(): string | JSX.Element {
-        if (this.state.balance !== -1) {
-            return this.state.balance + " GRLC";
-        } else {
-            const spinnerIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
-            return <Spin indicator={spinnerIcon} />
-        }
-    }
+
 }
 
 export default Wallet;

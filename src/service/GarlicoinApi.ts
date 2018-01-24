@@ -108,9 +108,9 @@ class GarlicoinApi {
         let executablePath: string = "";
 
         if(!remote.getGlobal('dev')) {
-            executablePath = "resources/";
+            executablePath = "./resources/";
         }
-        executablePath += "garlicoin-cli.exe";
+        executablePath += "garlicoin-cli";
 
         // Initialise command parameters
         let parameters: Array<string> = [];

@@ -1,7 +1,8 @@
 {
   "name": "GarlicoinWallet",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Garlicoin Manager",
+  "homepage": "https://gitlab.sidia.net",
   "main": "client/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -15,7 +16,7 @@
     "reddit",
     "sidia"
   ],
-  "author": "Sidia",
+  "author": "Sidia <admin@sidia.net>",
   "license": "ISC",
   "dependencies": {
     "@types/react": "^16.0.34",
@@ -24,6 +25,8 @@
     "awesome-typescript-loader": "^3.4.1",
     "css-loader": "^0.28.9",
     "extract-text-webpack-plugin": "^3.0.2",
+    "mobx": "^3.4.1",
+    "mobx-react": "^4.3.5",
     "moment": "^2.20.1",
     "node-sass": "^4.7.2",
     "react": "^16.2.0",
@@ -39,12 +42,13 @@
   },
   "devDependencies": {
     "electron": "^1.7.10",
-    "electron-builder": "^19.54.0"
+    "electron-builder": "^19.54.0",
+    "mobx-react-devtools": "^4.2.15"
   },
   "build": {
     "asar": true,
     "appId": "sidia.app",
-    "extraResources": "garlicoin-cli.exe",
+    "extraResources": "garlicoin-cli",
     "msi": {
       "warningsAsErrors": false
     },
@@ -58,6 +62,12 @@
         }
       ],
       "icon": "build/icon.ico"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "AppImage"
+      ]
     },
     "files": [
       "**/*",
