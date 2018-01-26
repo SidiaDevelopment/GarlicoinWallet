@@ -1,21 +1,19 @@
 import * as React from "react";
 
-import { notification } from 'antd';
-
 import GarlicoinApi, {TTransaction, TApiResponse, TTransactionData} from '../service/GarlicoinApi';
-import Spin from "antd/lib/spin";
 import Icon from "antd/lib/icon";
 import Row from 'antd/lib/grid/row';
 import Col from "antd/lib/grid/col";
 import Divider from "antd/lib/divider";
 import Table from "antd/lib/table/Table";
-import Steps from "antd/lib/steps";
 import TransactionModalContent from "./TransactionModalContent";
 import Modal from "antd/lib/modal/Modal";
 import Button from "antd/lib/button/button";
 import Balance from "./Balance";
-import BalanceStore from "../service/BalanceStore";
-const Step = Steps.Step;
+import BalanceStore from "../stores/BalanceStore";
+import message from 'antd/lib/message'
+import {clipboard} from 'electron'
+import StringHelper from "../service/StringHelper";
 
 interface TWalletProps {}
 interface TWalletState {
@@ -29,7 +27,6 @@ interface TWalletState {
  */
 class Wallet extends React.Component<TWalletProps, TWalletState> {
     private mounted: boolean = false;
-    balanceStore: BalanceStore;
 
     constructor(props: TWalletProps) {
         super(props);
@@ -37,8 +34,6 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
             transactions: [],
             transactionModalDataSet: null
         }
-
-        this.balanceStore = new BalanceStore();
     }
 
     /**
@@ -46,7 +41,7 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
      */
     componentDidMount() {
         this.mounted = true;
-        this.balanceStore.reloadBalance();
+        BalanceStore.reloadBalance();
         this.fetchTransactions();
     }
 
@@ -67,7 +62,7 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
             <div id="wallet">
                 <Divider>Garlicoin Balance</Divider>
                 <Row className="balance">
-                    <Col span={24}><Balance balanceStore={this.balanceStore} /></Col>
+                    <Col span={24}><Balance /></Col>
                 </Row>
                 <Divider>Transactions</Divider>
                 <Row className="transactions">
@@ -93,6 +88,15 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
                 title: 'TXID',
                 dataIndex: 'txid',
                 key: 'txid',
+                render: (_text: string, _record: TTransaction): JSX.Element => {
+                    return <span>
+                        { _text }&nbsp;
+                        <a onClick={() => {
+                            clipboard.writeText(_text);
+                            message.success(StringHelper.copiedString);
+                        }}><Icon style={{fontSize: 14}} type="paper-clip" /></a>
+                    </span>;
+                }
             },
             {
                 title: 'Options',
@@ -131,8 +135,7 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
     }
 
     fetchTransactions() {
-        let api = GarlicoinApi.getInstance();
-        api.getTransactions(100, this.fetchedTransactions)
+        GarlicoinApi.getTransactions(100, this.fetchedTransactions)
     }
 
     fetchedTransactions = (response: TApiResponse) => {
@@ -144,7 +147,9 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
             return _value;
         });
         transactions = transactions.reverse();
-        this.setState({transactions});
+        if(this.mounted) {
+            this.setState({transactions});
+        }
     };
 
 

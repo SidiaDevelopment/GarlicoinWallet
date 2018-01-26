@@ -6,6 +6,7 @@ import { Steps, Icon, message } from 'antd';
 import Divider from "antd/lib/divider";
 import List from "antd/lib/list";
 import GarlicoinDate from "../service/GarlicoinDate";
+import StringHelper from "../service/StringHelper";
 const Step = Steps.Step;
 
 interface TTransactionModalContentProps {
@@ -100,7 +101,7 @@ class TransactionModalContent extends React.Component<TTransactionModalContentPr
             {_description}&nbsp;
             {_clipboard && <a onClick={() => {
                 clipboard.writeText(_description as string);
-                message.success('Copied to clipboard');
+                message.success(StringHelper.copiedString);
             }}><Icon style={{fontSize: 14}} type="paper-clip" /></a>}
         </span>;
     }

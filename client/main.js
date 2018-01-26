@@ -28,6 +28,11 @@ function createWindow () {
     win.on('closed', () => {
         win = null
     });
+
+    win.webContents.on('new-window', (e, url) => {
+        e.preventDefault();
+        require('electron').shell.openExternal(url);
+    });
 }
 
 app.on('ready', createWindow);

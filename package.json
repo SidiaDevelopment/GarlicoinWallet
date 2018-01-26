@@ -9,7 +9,10 @@
     "build": "webpack",
     "dev": "webpack --watch",
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "trans:compile": "tsc -p . --target ES6 --module es6 --jsx preserve --outDir extracted",
+    "trans:extract": "babel  \"extracted/**/*.jsx\"",
+    "trans:manage": "node scripts/translationRunner.js"
   },
   "keywords": [
     "garlicoin",
@@ -21,6 +24,7 @@
   "dependencies": {
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
+    "@types/react-intl": "^2.3.3",
     "antd": "^3.1.3",
     "awesome-typescript-loader": "^3.4.1",
     "css-loader": "^0.28.9",
@@ -32,18 +36,23 @@
     "react": "^16.2.0",
     "react-app-rewired": "^1.4.0",
     "react-dom": "^16.2.0",
+    "react-intl": "^2.4.0",
     "sass-loader": "^6.0.6",
     "source-map-loader": "^0.2.3",
-    "ts-import-plugin": "^1.4.3",
     "ts-loader": "^3.2.0",
     "tslib": "^1.9.0",
     "typescript": "^2.6.2",
     "webpack": "^3.10.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-react-intl": "^2.4.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
     "electron": "^1.7.10",
     "electron-builder": "^19.54.0",
-    "mobx-react-devtools": "^4.2.15"
+    "mobx-react-devtools": "^4.2.15",
+    "react-intl-translations-manager": "^5.0.1"
   },
   "build": {
     "asar": true,

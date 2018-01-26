@@ -6,3 +6,5 @@ font/
 img/
 dist/
 npm-debug.log
+src/translations/extracted
+extracted/

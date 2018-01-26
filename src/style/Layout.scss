@@ -30,17 +30,30 @@
 				color: #1890ff;
 			}
 		}
-		.close {
+		.close, .minimize {
 			font-size: 18px;
 			line-height: 64px;
 			padding: 0 24px;
 			cursor: pointer;
 			transition: color .3s;
-			-webkit-app-region: no-drag;
 			float: right;
 			&:hover {
 				color: #1890ff;
 			}
+		}
+	}
+	&__navbar {
+		& > div {
+			display: flex;
+			flex-direction: column;
+		}
+		.ant-menu {
+			flex-grow: 1;
+		}
+		.copyright {
+			padding: 5px;
+			text-align: center;
+			color: rgba(255, 255, 255, 0.65);
 		}
 	}
 }

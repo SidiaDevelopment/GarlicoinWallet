@@ -6,7 +6,8 @@
  * Garlicoin to the moon!
  */
 
-import { remote, app } from 'electron';
+import { remote } from 'electron';
+import Logger from './Logger';
 /**
  * Callback with unformatted input
  */
@@ -76,6 +77,7 @@ export interface TTransactionData extends TTransaction {
  * Provides the api services through garlicoin-cli
  * @methods:
  *  - getBalance
+ *  - listTransactions
  *  - TODO
  */
 class GarlicoinApi {
@@ -85,13 +87,6 @@ class GarlicoinApi {
      * @type {{}}
      */
     private cache: TCache = {};
-
-    /**
-     * Holds the singleton instance for GarlicoinApi
-     *
-     * @type {GarlicoinApi}
-     */
-    private static instance: GarlicoinApi = null;
 
     /**
      * Make an api request via garlicoin-cli, cache is used by default
@@ -125,7 +120,7 @@ class GarlicoinApi {
                 // Cache exists, use cache
                 let response: TApiResponse = (<TCacheEntry>lastCacheEntry).response;
 
-                response.setCached();
+                Logger.log("Api call (cached):", _command, response);
 
                 _callback(response);
                 return;
@@ -204,8 +199,11 @@ class GarlicoinApi {
         return (_err: string, _data: any): void => {
             let response: TApiResponse = this.prepareResponse(_err, _data);
 
-            this.cacheSave(_command, response);
+            Logger.log("Api call:", _command, response);
+
             _originalCallback(response);
+            response.setCached();
+            this.cacheSave(_command, response);
         }
     }
 
@@ -243,22 +241,6 @@ class GarlicoinApi {
         }
         return false;
     }
-
-    /* Singleton logic */
-
-    /**
-     * Initialises the GarlicoinApi singleton instance if necessary
-     * Then returns the instance
-     *
-     * @returns {GarlicoinApi}
-     */
-    public static getInstance(): GarlicoinApi {
-        if (GarlicoinApi.instance === null) {
-            GarlicoinApi.instance = new GarlicoinApi();
-        }
-
-        return GarlicoinApi.instance;
-    }
 }
 
-export default GarlicoinApi;
+export default (new GarlicoinApi());
