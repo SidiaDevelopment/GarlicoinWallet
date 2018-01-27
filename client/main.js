@@ -3,9 +3,12 @@ const path = require('path');
 const url = require('url');
 
 let win;
-const dev = true;
+const dev = false;
+const demo = false;
 
 global.dev = dev;
+global.demo = demo;
+global.appPath = app.getAppPath();
 
 function createWindow () {
     // Create the browser window.

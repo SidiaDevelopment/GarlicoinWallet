@@ -7,6 +7,8 @@ import Divider from "antd/lib/divider";
 import List from "antd/lib/list";
 import GarlicoinDate from "../service/GarlicoinDate";
 import StringHelper from "../service/StringHelper";
+import {FormattedMessage} from 'react-intl';
+
 const Step = Steps.Step;
 
 interface TTransactionModalContentProps {
@@ -18,7 +20,7 @@ interface TTransactionModalContentState {
 }
 
 interface TTransactionDetailListItem {
-    title: string;
+    title: string | JSX.Element;
     description: string | JSX.Element;
     icon: string,
     clipboard?: boolean;
@@ -31,24 +33,32 @@ class TransactionModalContent extends React.Component<TTransactionModalContentPr
         }
         let dataSource: TTransactionDetailListItem[] = [
             {
-                title: 'Address',
+                title: <FormattedMessage id="transactions.address"
+                                         defaultMessage="Address" />,
                 description: this.props.data.address,
                 icon: 'user',
                 clipboard: true
             },
             {
-                title: 'Amount',
+                title: <FormattedMessage id="transactions.amount"
+                                         defaultMessage="Amount" />,
                 description: this.props.data.amount.toString(),
                 icon: 'area-chart',
                 clipboard: true
             },
             {
-                title: 'Type',
-                description: this.props.data.category === "receive" ? 'Received' : 'Sent',
+                title: <FormattedMessage id="transactions.type"
+                                         defaultMessage="Type" />,
+                description: this.props.data.category === "receive" ?
+                    <FormattedMessage id="transactions.received"
+                                      defaultMessage="Received" /> :
+                    <FormattedMessage id="transactions.sent"
+                                      defaultMessage="Sent" />,
                 icon: 'swap'
             },
             {
-                title: 'Confirmations',
+                title: <FormattedMessage id="transactions.confirmations"
+                                         defaultMessage="Confirmations" />,
                 description: this.getConfirmationStatus(this.props.data.confirmations),
                 icon: 'check'
             },
@@ -59,7 +69,8 @@ class TransactionModalContent extends React.Component<TTransactionModalContentPr
                 clipboard: true
             },
             {
-                title: 'Time',
+                title: <FormattedMessage id="transactions.time"
+                                         defaultMessage="Zeitpunkt" />,
                 description: GarlicoinDate.formattedDate(this.props.data.timereceived),
                 icon: 'clock-circle-o'
             }
@@ -68,15 +79,21 @@ class TransactionModalContent extends React.Component<TTransactionModalContentPr
             <div>
                 <Divider>Transaction</Divider>
                 <Steps>
-                    <Step status="finish" title="Send" icon={<Icon type="logout" />} />
+                    <Step status="finish"
+                          title={<FormattedMessage id="transactions.header.send"
+                                                   defaultMessage="Send" />}
+                          icon={<Icon type="logout" />} />
                     <Step
                         status={this.props.data.confirmations >= this.props.verifiedAfter && 'finish' || 'process'}
-                        title="Verification"
+                        title={<FormattedMessage id="transactions.header.verification"
+                                                 defaultMessage="Verification" />}
                         icon={this.props.data.confirmations >= this.props.verifiedAfter && <Icon type="solution" /> || <Icon type="loading" />}
                     />
                     <Step
                         status={this.props.data.confirmations >= this.props.verifiedAfter && 'finish' || 'wait'}
-                        title="Received" icon={<Icon type="login" />}
+                        title={<FormattedMessage id="transactions.header.received"
+                                                 defaultMessage="Received" />}
+                        icon={<Icon type="login" />}
                     />
                 </Steps>
                 <Divider/>

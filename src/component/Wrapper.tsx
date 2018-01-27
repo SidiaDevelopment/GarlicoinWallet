@@ -7,6 +7,9 @@ import SettingsStore from "../stores/SettingsStore";
 import App from './App';
 
 import { IntlProvider } from 'react-intl';
+import GarlicoinApi from "../service/GarlicoinApi";
+import LoadingScreen from "./LoadingScreen";
+import {remote} from 'electron';
 
 
 export const localeData: any = {
@@ -18,9 +21,11 @@ interface TWrapperState {}
 
 @observer
 class Wrapper extends React.Component<TWrapperProps, TWrapperState> {
-        render(): JSX.Element {
+    render(): JSX.Element {
         return <IntlProvider locale={SettingsStore.getLanguage()} key={SettingsStore.getLanguage()} messages={localeData[SettingsStore.getLanguage()]}>
-            <App />
+            { GarlicoinApi.getDaemonStatus() == 'finished' || (remote.getGlobal('dev') && !remote.getGlobal('demo')) ?
+                <App /> :
+                <LoadingScreen/> }
         </IntlProvider>;
     }
 }

@@ -14,6 +14,7 @@ import BalanceStore from "../stores/BalanceStore";
 import message from 'antd/lib/message'
 import {clipboard} from 'electron'
 import StringHelper from "../service/StringHelper";
+import {FormattedMessage} from 'react-intl';
 
 interface TWalletProps {}
 interface TWalletState {
@@ -60,11 +61,15 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
     render(): JSX.Element {
         return (
             <div id="wallet">
-                <Divider>Garlicoin Balance</Divider>
+                <Divider><FormattedMessage id="wallet.divider_balance"
+                                           defaultMessage="Garlicoin Balance"
+                                           description="Balance divider" /></Divider>
                 <Row className="balance">
                     <Col span={24}><Balance /></Col>
                 </Row>
-                <Divider>Transactions</Divider>
+                <Divider><FormattedMessage id="wallet.divider_transactions"
+                                           defaultMessage="Transactions"
+                                           description="Transactions divider" /></Divider>
                 <Row className="transactions">
                     { this.getTransactionList() }
                 </Row>
@@ -80,7 +85,9 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
     getTransactionTable(loading: boolean = false): JSX.Element {
         const columns = [
             {
-                title: 'Amount',
+                title: <FormattedMessage id="transactions.amount"
+                                         defaultMessage="Amount"
+                                         description="Amount" />,
                 dataIndex: 'amount',
                 key: 'amount',
             },
@@ -99,7 +106,9 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
                 }
             },
             {
-                title: 'Options',
+                title: <FormattedMessage id="transactions.options"
+                                         defaultMessage="Options"
+                                         description="Transactions options" />,
                 key: 'option',
                 render: (_text: string, _record: TTransaction): JSX.Element => {
                     return <div>

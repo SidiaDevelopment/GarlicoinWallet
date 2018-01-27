@@ -8,11 +8,13 @@
 
 import { remote } from 'electron';
 import Logger from './Logger';
+import {observable} from "mobx";
+import {TSendModalData} from "../component/Send";
 /**
  * Callback with unformatted input
  */
 export interface TCallback {
-    (_err: string, _data: any): void
+    (_err: string, _data: any, _stderr: any): void
 }
 
 /**
@@ -42,11 +44,11 @@ interface TCacheEntry {
  */
 export interface TApiResponse {
     data: any;
-    err: string;
+    err: any;
     cached: boolean;
 
     getData(): any;
-    getError(): string;
+    getError(): any;
     wasCached(): boolean;
     setCached(): void;
     getJson(): JSON;
@@ -69,6 +71,11 @@ export interface TTransaction {
     timereceived: number;
 }
 
+export interface TBlockChainInfo {
+    blocks: number;
+    headers: number;
+}
+
 export interface TTransactionData extends TTransaction {
     key: number;
 }
@@ -88,6 +95,15 @@ class GarlicoinApi {
      */
     private cache: TCache = {};
 
+    @observable
+    private daemonStatus: 'exited' | 'starting' | 'fetching' | 'finished' = 'starting';
+
+    @observable
+    private fetchingStatus: TBlockChainInfo = {
+        blocks: 0,
+        headers: 0
+    };
+
     /**
      * Make an api request via garlicoin-cli, cache is used by default
      * One result instance per request type will be saved
@@ -98,12 +114,13 @@ class GarlicoinApi {
      * @param {number} _cacheTime
      */
     call(_command: string, _parameters: ReadonlyArray<any>, _callback: TResponseCallback, _cacheTime: number = 0) {
+        Logger.log("Sent api call:", _command, _parameters);
         // Init garlicoin-cli
         let child = require('child_process').execFile;
         let executablePath: string = "";
 
         if(!remote.getGlobal('dev')) {
-            executablePath = "./resources/";
+            executablePath = remote.getGlobal('appPath').replace('app.asar', '');
         }
         executablePath += "garlicoin-cli";
 
@@ -131,7 +148,7 @@ class GarlicoinApi {
         encapsulatedCacheCallback = this.encapsulatedCacheCallback(_command, _callback);
 
         // Fetch
-        child(executablePath, parameters, encapsulatedCacheCallback);
+        child(executablePath, parameters, {windowsVerbatimArguments: true}, encapsulatedCacheCallback);
     }
 
     /**
@@ -181,10 +198,46 @@ class GarlicoinApi {
         this.call("getbalance", [], _callback, 10);
     }
 
+    /**
+     * Fetch all transactions
+     *
+     * @param {number} _count
+     * @param {TResponseCallback} _callback
+     */
     public getTransactions(_count: number, _callback: TResponseCallback) {
         this.call("listtransactions", ['*', _count], _callback, 60);
     }
 
+    public getBlockChainInfo(_callback: TResponseCallback) {
+        this.call("getblockchaininfo", [], _callback, 0);
+    }
+
+    public getAccountList(_callback: TResponseCallback) {
+        this.call("listaccounts", [], _callback, 0);
+    }
+
+    public getAddressesByAccount(_account: string, _callback: TResponseCallback) {
+        let account = _account == "" ? '""' : _account;
+        this.call("getaddressesbyaccount", [account], _callback, 0);
+    }
+
+    public sendFrom(_options: TSendModalData, _callback: TResponseCallback) {
+        let account = _options.from.length == 0 ? '""' : _options.from;
+        let params = [account, _options.receiver, _options.amount]
+        if(_options.comment) {
+            params.push(1);
+            params.push('"' + _options.comment + '"');
+        }
+        if(_options.comment2) {
+            params.push('"' + _options.comment2 + '"');
+        }
+        this.call(
+            'sendfrom',
+            params,
+            _callback,
+            0
+        )
+    }
 
     /* Cache logic */
 
@@ -196,7 +249,7 @@ class GarlicoinApi {
      * @returns {TCallback}
      */
     encapsulatedCacheCallback(_command: string, _originalCallback: TResponseCallback): TCallback {
-        return (_err: string, _data: any): void => {
+        return (_err: string, _data: any, _stderr: any): void => {
             let response: TApiResponse = this.prepareResponse(_err, _data);
 
             Logger.log("Api call:", _command, response);
@@ -241,6 +294,51 @@ class GarlicoinApi {
         }
         return false;
     }
+
+    /** Daemon logic **/
+    setDaemonStatus(_status: 'exited' | 'starting' | 'fetching' | 'finished') {
+        this.daemonStatus = _status;
+    }
+
+    fetchDaemonStatus = () => {
+        this.getBlockChainInfo(this.fetchedDaemonStatus);
+    }
+
+    fetchedDaemonStatus = (_response: TApiResponse) => {
+        let error: string = "";
+        if(_response.getError()) {
+            error = _response.getError().message;
+        }
+        if (error && error.indexOf('error code: -28') !== -1) {
+            this.setDaemonStatus('starting');
+            this.fetchDaemonStatus();
+        } else if (error && error.indexOf('couldn\'t connect to server') !== -1) {
+            this.setDaemonStatus('exited');
+            this.fetchDaemonStatus();
+        } else if (error) {
+            Logger.log('Got error from GarlicoinApi', _response.getError());
+        } else {
+            let graceBlockDiff = 10;
+            let blockChain: TBlockChainInfo = _response.getJson() as any;
+            if(blockChain.blocks + graceBlockDiff < blockChain.headers) {
+                this.setDaemonStatus('fetching');
+                this.fetchingStatus = blockChain;
+                this.fetchDaemonStatus();
+            } else {
+                this.setDaemonStatus('finished');
+            }
+        }
+    }
+
+    @observable
+    getDaemonStatus(): 'exited' | 'starting' | 'fetching' | 'finished' {
+        return this.daemonStatus;
+    }
+
+    getDaemonFetchingStatus(): TBlockChainInfo {
+        return this.fetchingStatus;
+    }
+
 }
 
 export default (new GarlicoinApi());

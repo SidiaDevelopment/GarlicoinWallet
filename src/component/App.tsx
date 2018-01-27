@@ -1,8 +1,8 @@
 import * as React from "react";
 import Wallet from './Wallet';
 import Settings from './Settings'
-import { Layout, Menu, Icon } from 'antd';
-import { remote, BrowserWindow } from 'electron';
+import { Layout, Menu, Icon, Form} from 'antd';
+import {remote, BrowserWindow} from 'electron';
 import {SelectParam} from "antd/lib/menu";
 import Send from "./Send";
 import DevTools from "mobx-react-devtools";
@@ -25,35 +25,49 @@ interface TElements {
 
 @observer
 class App extends React.Component<TAppProps, TAppState> {
-    constructor(props: TAppProps) {
-        super(props);
-        this.state = {
-            collapsed: false,
-        };
-    }
-
+    /**
+     * Switch collapse status
+     */
     toggle = () => {
         SettingsStore.switchCollapse();
     }
 
+    /**
+     * Close app
+     */
     close() {
         let window: BrowserWindow = remote.getCurrentWindow();
         window.close();
     }
 
+    /**
+     * Minimize app
+     */
     minimize() {
         let window: BrowserWindow = remote.getCurrentWindow();
         window.minimize();
     }
 
+    /**
+     * Selecte menu point
+     * @param {SelectParam} params
+     */
     menuSelect = (params: SelectParam) => {
         SettingsStore.setContent(params.key);
     }
 
+    /**
+     * Get the content
+     * @returns {JSX.Element}
+     */
     get contentDisplay() {
+
         let elements: TElements = {
             wallet: () => <Wallet/>,
-            send: () => <Send/>,
+            send: () =>  {
+                const WrappedHorizontalLoginForm = Form.create()(Send);
+                return <WrappedHorizontalLoginForm/>;
+            },
             settings: () => <Settings />
         };
 
@@ -64,6 +78,10 @@ class App extends React.Component<TAppProps, TAppState> {
         }
     }
 
+    /**
+     * Render
+     * @returns {any}
+     */
     render() {
         return <Layout className="layout__wrapper">
             <Sider

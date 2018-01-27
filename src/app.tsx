@@ -13,8 +13,9 @@ addLocaleData([...en, ...de]);
 
 
 import Wrapper from "./component/Wrapper";
-
+import GarlicoinDaemon from "./service/GarlicoinDaemon";
+GarlicoinDaemon.start();
 ReactDOM.render(
     <Wrapper />,
     document.getElementById("wrapper")
-);
+)

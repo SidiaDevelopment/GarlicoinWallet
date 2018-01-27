@@ -1,18 +1,19 @@
 {
   "name": "GarlicoinWallet",
-  "version": "0.0.3",
+  "version": "0.0.11",
   "description": "Garlicoin Manager",
   "homepage": "https://gitlab.sidia.net",
   "main": "client/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No test specified\" && exit 1",
     "build": "webpack",
     "dev": "webpack --watch",
     "start": "electron .",
     "dist": "electron-builder",
     "trans:compile": "tsc -p . --target ES6 --module es6 --jsx preserve --outDir extracted",
     "trans:extract": "babel  \"extracted/**/*.jsx\"",
-    "trans:manage": "node scripts/translationRunner.js"
+    "trans:manage": "node scripts/translationRunner.js",
+    "trans:all": "npm run trans:compile && npm run trans:extract && npm run trans:manage"
   },
   "keywords": [
     "garlicoin",
@@ -29,12 +30,12 @@
     "awesome-typescript-loader": "^3.4.1",
     "css-loader": "^0.28.9",
     "extract-text-webpack-plugin": "^3.0.2",
+    "jquery": "^3.3.1",
     "mobx": "^3.4.1",
     "mobx-react": "^4.3.5",
     "moment": "^2.20.1",
     "node-sass": "^4.7.2",
     "react": "^16.2.0",
-    "react-app-rewired": "^1.4.0",
     "react-dom": "^16.2.0",
     "react-intl": "^2.4.0",
     "sass-loader": "^6.0.6",
@@ -49,19 +50,19 @@
     "babel-plugin-react-intl": "^2.4.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
-    "electron": "^1.7.10",
-    "electron-builder": "^19.54.0",
     "mobx-react-devtools": "^4.2.15",
-    "react-intl-translations-manager": "^5.0.1"
+    "react-intl-translations-manager": "^5.0.1",
+    "electron": "^1.7.10",
+    "electron-builder": "^19.54.0"
   },
   "build": {
     "asar": true,
     "appId": "sidia.app",
-    "extraResources": "garlicoin-cli",
     "msi": {
       "warningsAsErrors": false
     },
     "win": {
+      "extraResources": ["garlicoin-cli.exe", "garlicoind.exe"],
       "target": [
         {
           "target": "msi",
@@ -73,6 +74,7 @@
       "icon": "build/icon.ico"
     },
     "linux": {
+      "extraResources": ["garlicoin-cli", "garlicoind"],
       "target": [
         "deb",
         "AppImage"
@@ -81,7 +83,9 @@
     "files": [
       "**/*",
       "!node_modules/*",
-      "!src/*"
+      "!src/*",
+      "!scripts/*",
+      "!extracted/*"
     ]
   }
 }

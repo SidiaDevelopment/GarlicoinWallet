@@ -13,6 +13,12 @@ class StringHelper {
             description="Copied to clipboard" />
         </IntlProvider>;
     }
+
+    public wrapIntl(_elem: JSX.Element) {
+        return <IntlProvider locale={SettingsStore.getLanguage()} key={SettingsStore.getLanguage()} messages={localeData[SettingsStore.getLanguage()]}>
+            {_elem}
+        </IntlProvider>
+    }
 }
 
 export default (new StringHelper());
