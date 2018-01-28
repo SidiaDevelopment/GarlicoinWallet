@@ -3,6 +3,8 @@ import {localeData} from "../component/Wrapper";
 import * as fs from 'fs';
 import * as path from "path";
 import * as electron from "electron";
+import {Simulate} from "react-dom/test-utils";
+import waiting = Simulate.waiting;
 
 interface TSettings {
     lang: string;

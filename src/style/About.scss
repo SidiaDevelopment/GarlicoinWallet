@@ -1,0 +1,18 @@
+#about {
+	.branding, .patchNotes {
+		text-align: center;
+	}
+	.detaillist {
+		.anticon {
+			font-size: 40px;
+		}
+	}
+}
+
+.patchNotesModal {
+	.patchNotesHelp {
+		display: flex;
+		justify-content: space-around;
+		margin-bottom: 20px;
+	}
+}

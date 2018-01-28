@@ -11,6 +11,7 @@ import SiderCopyright from "./SiderCopyright";
 import SettingsStore from "../stores/SettingsStore";
 import {observer} from "mobx-react";
 import AddressList from "./Pages/AddressList";
+import About from "./Pages/About";
 
 const { Header, Sider, Content } = Layout;
 
@@ -66,11 +67,12 @@ class App extends React.Component<TAppProps, TAppState> {
         let elements: TElements = {
             wallet: () => <Wallet/>,
             send: () =>  {
-                const WrappedHorizontalLoginForm = Form.create()(Send);
-                return <WrappedHorizontalLoginForm/>;
+                const WrappedSendForm = Form.create()(Send);
+                return <WrappedSendForm/>;
             },
             settings: () => <Settings />,
-            addresses: () => <AddressList />
+            addresses: () => <AddressList />,
+            about: () => <About />
         };
 
         if (elements.hasOwnProperty(SettingsStore.getContent())) {
@@ -120,6 +122,12 @@ class App extends React.Component<TAppProps, TAppState> {
                         <FormattedMessage id="navigation.settings"
                                           defaultMessage="Settings"
                                           description="Settings navigation point" />
+                    </Menu.Item>
+                    <Menu.Item key="about">
+                        <Icon type="info-circle"/>
+                        <FormattedMessage id="navigation.about"
+                                          defaultMessage="About"
+                                          description="About navigation point" />
                     </Menu.Item>
                 </Menu>
                 <SiderCopyright />

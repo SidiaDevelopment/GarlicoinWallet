@@ -45,13 +45,6 @@ export class BalanceStore {
             Logger.log(_response.getError());
         } else {
             this.setBalance(_response.getData().toString());
-            if (!_response.wasCached()) {
-                notification.open({
-                    message: 'New balance fetched',
-                    description: _response.getData().toString(),
-                    placement: "bottomRight"
-                });
-            }
         }
         this.setFetching(false);
     };
