@@ -1,12 +1,12 @@
 import * as React from "react";
-import {TTransaction} from "../service/GarlicoinApi";
+import {TTransaction} from "../../../service/GarlicoinApi";
 import {clipboard} from 'electron'
 import Badge from "antd/lib/badge";
 import { Steps, Icon, message } from 'antd';
 import Divider from "antd/lib/divider";
 import List from "antd/lib/list";
-import GarlicoinDate from "../service/GarlicoinDate";
-import StringHelper from "../service/StringHelper";
+import GarlicoinDate from "../../../service/GarlicoinDate";
+import StringHelper from "../../../service/StringHelper";
 import {FormattedMessage} from 'react-intl';
 
 const Step = Steps.Step;
@@ -70,7 +70,7 @@ class TransactionModalContent extends React.Component<TTransactionModalContentPr
             },
             {
                 title: <FormattedMessage id="transactions.time"
-                                         defaultMessage="Zeitpunkt" />,
+                                         defaultMessage="Time" />,
                 description: GarlicoinDate.formattedDate(this.props.data.timereceived),
                 icon: 'clock-circle-o'
             }

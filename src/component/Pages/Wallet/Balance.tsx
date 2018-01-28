@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Icon from "antd/lib/icon";
-import BalanceStore from "../stores/BalanceStore";
+import BalanceStore from "../../../stores/BalanceStore";
 import Spin from "antd/lib/spin";
 import {observer} from "mobx-react";
 

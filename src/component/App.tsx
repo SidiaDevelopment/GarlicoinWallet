@@ -1,15 +1,16 @@
 import * as React from "react";
-import Wallet from './Wallet';
-import Settings from './Settings'
+import Wallet from './Pages/Wallet';
+import Settings from './Pages/Settings'
 import { Layout, Menu, Icon, Form} from 'antd';
 import {remote, BrowserWindow} from 'electron';
 import {SelectParam} from "antd/lib/menu";
-import Send from "./Send";
+import Send from "./Pages/Send";
 import DevTools from "mobx-react-devtools";
 import { FormattedMessage } from 'react-intl';
 import SiderCopyright from "./SiderCopyright";
 import SettingsStore from "../stores/SettingsStore";
 import {observer} from "mobx-react";
+import AddressList from "./Pages/AddressList";
 
 const { Header, Sider, Content } = Layout;
 
@@ -68,7 +69,8 @@ class App extends React.Component<TAppProps, TAppState> {
                 const WrappedHorizontalLoginForm = Form.create()(Send);
                 return <WrappedHorizontalLoginForm/>;
             },
-            settings: () => <Settings />
+            settings: () => <Settings />,
+            addresses: () => <AddressList />
         };
 
         if (elements.hasOwnProperty(SettingsStore.getContent())) {
@@ -106,6 +108,12 @@ class App extends React.Component<TAppProps, TAppState> {
                         <FormattedMessage id="navigation.send_coins"
                                           defaultMessage="Send Coins"
                                           description="Send Coins navigation point" />
+                    </Menu.Item>
+                    <Menu.Item key="addresses">
+                        <Icon type="link"/>
+                        <FormattedMessage id="navigation.address_manager"
+                                          defaultMessage="Addresses"
+                                          description="Addresses navigation point" />
                     </Menu.Item>
                     <Menu.Item key="settings">
                         <Icon type="setting"/>

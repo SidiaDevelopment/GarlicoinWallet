@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Select from "antd/lib/select";
-import SettingsStore from "../stores/SettingsStore";
+import SettingsStore from "../../stores/SettingsStore";
 const Option = Select.Option;
 
 interface TSettingsProps {}

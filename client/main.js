@@ -3,7 +3,7 @@ const path = require('path');
 const url = require('url');
 
 let win;
-const dev = false;
+const dev = true;
 const demo = false;
 
 global.dev = dev;

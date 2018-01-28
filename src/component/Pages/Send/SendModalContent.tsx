@@ -3,10 +3,10 @@ import {clipboard} from 'electron'
 import { Steps, Icon, message } from 'antd';
 import Divider from "antd/lib/divider";
 import List from "antd/lib/list";
-import StringHelper from "../service/StringHelper";
+import StringHelper from "../../../service/StringHelper";
 import {FormattedMessage} from 'react-intl';
-import {TSendModalData} from "./Send";
-import SettingsStore from "../stores/SettingsStore";
+import {TSendModalData} from "../Send";
+import SettingsStore from "../../../stores/SettingsStore";
 import { IntlProvider } from 'react-intl';
 
 const Step = Steps.Step;

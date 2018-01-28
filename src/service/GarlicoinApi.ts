@@ -9,7 +9,7 @@
 import { remote } from 'electron';
 import Logger from './Logger';
 import {observable} from "mobx";
-import {TSendModalData} from "../component/Send";
+import {TSendModalData} from "../component/Pages/Send";
 /**
  * Callback with unformatted input
  */
@@ -54,6 +54,9 @@ export interface TApiResponse {
     getJson(): JSON;
 }
 
+/**
+ * Transaction api response
+ */
 export interface TTransaction {
     account: string;
     address: string;
@@ -71,20 +74,32 @@ export interface TTransaction {
     timereceived: number;
 }
 
+/**
+ * Partial response from getblockchaininfo
+ */
 export interface TBlockChainInfo {
     blocks: number;
     headers: number;
 }
 
+/**
+ * Extension for displaying in lists
+ */
 export interface TTransactionData extends TTransaction {
     key: number;
 }
 
 /**
  * Provides the api services through garlicoin-cli
+ *
  * @methods:
  *  - getBalance
- *  - listTransactions
+ *  - getTransactions
+ *  - getBlockChainInfo
+ *  - getAccountList
+ *  - getAddressesByAccount
+ *  - sendFrom
+ *  - getNewAddress
  *  - TODO
  */
 class GarlicoinApi {
@@ -208,19 +223,41 @@ class GarlicoinApi {
         this.call("listtransactions", ['*', _count], _callback, 60);
     }
 
+    /**
+     * Get current blockchain informations
+     *
+     * @param {TResponseCallback} _callback
+     */
     public getBlockChainInfo(_callback: TResponseCallback) {
         this.call("getblockchaininfo", [], _callback, 0);
     }
 
+    /***
+     * Get all accounts in wallet
+     *
+     * @param {TResponseCallback} _callback
+     */
     public getAccountList(_callback: TResponseCallback) {
         this.call("listaccounts", [], _callback, 0);
     }
 
+    /**
+     * Get all addresses by account
+     *
+     * @param {string} _account
+     * @param {TResponseCallback} _callback
+     */
     public getAddressesByAccount(_account: string, _callback: TResponseCallback) {
         let account = _account == "" ? '""' : _account;
         this.call("getaddressesbyaccount", [account], _callback, 0);
     }
 
+    /**
+     * Send coins from address to receiver
+     *
+     * @param {TSendModalData} _options
+     * @param {TResponseCallback} _callback
+     */
     public sendFrom(_options: TSendModalData, _callback: TResponseCallback) {
         let account = _options.from.length == 0 ? '""' : _options.from;
         let params = [account, _options.receiver, _options.amount]
@@ -237,6 +274,17 @@ class GarlicoinApi {
             _callback,
             0
         )
+    }
+
+    /**
+     * Get new address for account
+     *
+     * @param {string} _account
+     * @param {TResponseCallback} _callback
+     */
+    public getNewAddress(_account: string, _callback: TResponseCallback) {
+        let account = _account.length == 0 ? '""' : _account;
+        this.call('getnewaddress', [account], _callback, 0);
     }
 
     /* Cache logic */
@@ -295,32 +343,48 @@ class GarlicoinApi {
         return false;
     }
 
-    /** Daemon logic **/
+    /* Daemon logic */
+
+    /**
+     * Set in which status the daemon is right now
+     * @param {"exited" | "starting" | "fetching" | "finished"} _status
+     */
     setDaemonStatus(_status: 'exited' | 'starting' | 'fetching' | 'finished') {
         this.daemonStatus = _status;
     }
 
+    /**
+     * Get daemon status
+     */
     fetchDaemonStatus = () => {
         this.getBlockChainInfo(this.fetchedDaemonStatus);
     }
 
+    /**
+     * Callback for daemon status
+     * @param {TApiResponse} _response
+     */
     fetchedDaemonStatus = (_response: TApiResponse) => {
         let error: string = "";
         if(_response.getError()) {
             error = _response.getError().message;
         }
         if (error && error.indexOf('error code: -28') !== -1) {
+            // Starting up daemon
             this.setDaemonStatus('starting');
             this.fetchDaemonStatus();
         } else if (error && error.indexOf('couldn\'t connect to server') !== -1) {
+            // Daemon not started at all
             this.setDaemonStatus('exited');
             this.fetchDaemonStatus();
         } else if (error) {
+            // Unknown error
             Logger.log('Got error from GarlicoinApi', _response.getError());
         } else {
-            let graceBlockDiff = 10;
+            // Check if daemon is fetching or ready
+            let graceBlockDiff = 50;
             let blockChain: TBlockChainInfo = _response.getJson() as any;
-            if(blockChain.blocks + graceBlockDiff < blockChain.headers) {
+            if(blockChain.blocks + graceBlockDiff < blockChain.headers || blockChain.headers == 0) {
                 this.setDaemonStatus('fetching');
                 this.fetchingStatus = blockChain;
                 this.fetchDaemonStatus();
@@ -330,11 +394,19 @@ class GarlicoinApi {
         }
     }
 
+    /**
+     * Returns the daemon status
+     * @returns {"exited" | "starting" | "fetching" | "finished"}
+     */
     @observable
     getDaemonStatus(): 'exited' | 'starting' | 'fetching' | 'finished' {
         return this.daemonStatus;
     }
 
+    /**
+     * Gets how much blocks the daemon has fetched
+     * @returns {TBlockChainInfo}
+     */
     getDaemonFetchingStatus(): TBlockChainInfo {
         return this.fetchingStatus;
     }

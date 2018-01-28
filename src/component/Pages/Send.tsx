@@ -6,15 +6,15 @@ import FormItem from "antd/lib/form/FormItem";
 import Input from "antd/lib/input/Input";
 
 import {FormComponentProps} from "antd/lib/form";
-import AccountStore from "../stores/AccountStore";
+import AccountStore from "../../stores/AccountStore";
 import Select from "antd/lib/select";
 import {observer} from "mobx-react";
 import Button from "antd/lib/button/button";
 import {Icon, notification} from 'antd';
 import Modal from "antd/lib/modal/Modal";
-import SendModalContent from "./SendModalContent";
-import GarlicoinApi, {TApiResponse} from "../service/GarlicoinApi";
-import StringHelper from "../service/StringHelper";
+import SendModalContent from "./Send/SendModalContent";
+import GarlicoinApi, {TApiResponse} from "../../service/GarlicoinApi";
+import StringHelper from "../../service/StringHelper";
 
 const Option = Select.Option;
 export interface TSendModalData {
@@ -39,7 +39,7 @@ class Send extends React.Component<FormComponentProps, TSendState> {
     }
 
     componentDidMount() {
-        AccountStore.fetchAccounts();
+        AccountStore.fetchAccounts(true);
     }
 
     handleSubmit = (e: any) => {

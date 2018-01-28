@@ -1,7 +1,7 @@
 import {observable} from "mobx";
 import GarlicoinApi, {TApiResponse} from "../service/GarlicoinApi";
 
-interface TWallet {
+export interface TWallet {
     [name: string]: string[];
 }
 
@@ -18,11 +18,25 @@ class AccountStore {
     @observable
     balanceByAccount: Object = {};
 
-    fetchAccounts() {
+    /**
+     * Get all accounts
+     *
+     * @param {boolean} useCached
+     */
+    fetchAccounts(useCached: boolean) {
+        if (useCached && this.accounts.length) {
+            return;
+        }
+        this.wallet = {};
         this.runningRequests.push('*');
         GarlicoinApi.getAccountList(this.receiveAccounts);
     }
 
+    /**
+     * Get all accounts callback
+     *
+     * @param {TApiResponse} _response
+     */
     receiveAccounts = (_response: TApiResponse) => {
         this.balanceByAccount = _response.getJson();
         this.accounts = Object.keys(_response.getJson());
@@ -32,13 +46,23 @@ class AccountStore {
         })
     }
 
+    /**
+     * Get all addresses by accounts
+     */
     fetchAddresses = () => {
         this.accounts.map((_account: string) => {
             this.runningRequests.push(_account);
+            this.wallet[_account] = [];
             GarlicoinApi.getAddressesByAccount(_account, this.fetchedAddressesByAccount(_account));
         })
     }
 
+    /**
+     * Get all addresses by account callback
+     *
+     * @param {string} _account
+     * @returns {(_response: TApiResponse) => void}
+     */
     fetchedAddressesByAccount = (_account: string) => {
         return (_response: TApiResponse) => {
             this.wallet[_account] = _response.getJson() as any;
@@ -48,12 +72,23 @@ class AccountStore {
         }
     };
 
+    /**
+     * Returns if fetching is done
+     *
+     * @returns {boolean | number}
+     */
     @observable
     isDone() {
-        return this.runningRequests.length == 0 || this.wallet == null;
+        return (this.runningRequests.length == 0 && this.accounts.length);
     }
 
-    getAllAccounts(): TWallet{
+    /**
+     * Returns all accounts
+     *
+     * @returns {TWallet}
+     */
+    @observable
+    getAllAccounts(): TWallet {
         if (!this.isDone()) {
             return null;
         }
@@ -61,6 +96,10 @@ class AccountStore {
         return this.wallet;
     }
 
+    /**
+     * Return a list of all account names
+     * @returns {string[]}
+     */
     @observable
     getAllAccountNames(): string[] {
         if (!this.isDone()) {
