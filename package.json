@@ -1,6 +1,6 @@
 {
   "name": "GarlicoinWallet",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Garlicoin Manager",
   "homepage": "https://gitlab.sidia.net",
   "main": "client/main.js",
@@ -9,8 +9,7 @@
     "build": "webpack",
     "dev": "webpack --watch",
     "start": "electron .",
-    "dist": "electron-builder",
-    "distl": "electron-builder -wl",
+    "dist": "electron-builder -wl",
     "trans:compile": "tsc -p . --target ES6 --module es6 --jsx preserve --outDir extracted",
     "trans:extract": "babel  \"extracted/**/*.jsx\"",
     "trans:manage": "node scripts/translationRunner.js",

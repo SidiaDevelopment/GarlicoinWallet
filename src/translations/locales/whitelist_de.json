@@ -1,3 +1,8 @@
 [
-  "navigation.wallet"
+  "about.version",
+  "about.repository",
+  "about.patch_notes.title",
+  "navigation.wallet",
+  "about.error.message.bugtracker",
+  "about.error.message.discord"
 ]
