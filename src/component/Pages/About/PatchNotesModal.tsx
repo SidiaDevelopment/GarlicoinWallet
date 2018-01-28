@@ -20,6 +20,10 @@ class PatchNotesModal extends React.Component<{},{}> {
                 <Timeline.Item dot={<Icon type="loading" style={{ fontSize: '16px' }} spin />}>
                     Explorer...
                 </Timeline.Item>
+                <Timeline.Item dot={<Icon type="exclamation-circle" style={{ fontSize: '16px' }} />} color="yellow">
+                    <p><strong>v0.0.13.1</strong></p>
+                    <p> - Fixed config loading error</p>
+                </Timeline.Item>
                 <Timeline.Item dot={<Icon type="plus-circle" style={{ fontSize: '16px' }} />} color="green">
                     <p><strong>v0.0.13</strong></p>
                     <p> - About page</p>
