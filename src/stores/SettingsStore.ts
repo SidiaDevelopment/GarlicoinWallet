@@ -26,8 +26,9 @@ class SettingsStore {
         let defaults = {
             content: 'wallet'
         };
-
-        this.settings = Object.assign({}, JSON.parse(fs.readFileSync(settingsFile) as any), defaults);
+        if (fs.existsSync(settingsFile)) {
+            this.settings = Object.assign({}, JSON.parse(fs.readFileSync(settingsFile) as any), defaults);
+        }
 
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "GarlicoinWallet",
-  "version": "0.0.13",
+  "version": "0.0.13.1",
   "description": "Garlicoin Manager",
   "homepage": "https://gitlab.sidia.net",
   "main": "client/main.js",
