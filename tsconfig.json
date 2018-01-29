@@ -26,13 +26,6 @@
     "exclude": [
         "node_modules",
         "dist",
-        "scripts",
-        "npm-debug.log",
-        "webpack.config.js",
-        "README.md",
-        "CODE_OF_CONDUCT.md",
-        "package-lock.json",
-        "package.json",
-        "tsconfig.json"
+        "scripts"
     ]
 }

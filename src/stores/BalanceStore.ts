@@ -42,7 +42,7 @@ export class BalanceStore {
      */
     fetchedWalletBalance = (_response: TApiResponse) => {
         if (_response.getError() != null) {
-            Logger.log(_response.getError());
+            Logger.log(Logger.LOGLEVEL_ERROR, _response.getError());
         } else {
             this.setBalance(_response.getData().toString());
         }

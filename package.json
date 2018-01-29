@@ -1,6 +1,6 @@
 {
   "name": "GarlicoinWallet",
-  "version": "0.0.13.1",
+  "version": "0.0.14",
   "description": "Garlicoin Manager",
   "homepage": "https://gitlab.sidia.net",
   "main": "client/main.js",
@@ -62,7 +62,7 @@
       "warningsAsErrors": false
     },
     "win": {
-      "extraResources": ["garlicoin-cli.exe", "garlicoind.exe"],
+      "extraResources": ["garlicoin.conf", "garlicoind.exe"],
       "target": [
         {
           "target": "msi",
@@ -74,7 +74,7 @@
       "icon": "build/icon.ico"
     },
     "linux": {
-      "extraResources": ["garlicoin-cli", "garlicoind"],
+      "extraResources": ["garlicoin.conf", "garlicoind"],
       "target": [
         "deb"
       ]
@@ -84,7 +84,14 @@
       "!node_modules/*",
       "!src/*",
       "!scripts/*",
-      "!extracted/*"
+      "!extracted/*",
+      "!npm-debug.log",
+      "!webpack.config.js",
+      "!README.md",
+      "!CODE_OF_CONDUCT.md",
+      "!package-lock.json",
+      "!package.json",
+      "!tsconfig.json"
     ]
   }
 }

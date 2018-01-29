@@ -10,11 +10,12 @@ import { remote } from 'electron';
 import Logger from './Logger';
 import {observable} from "mobx";
 import {TSendModalData} from "../component/Pages/Send";
+import RpcClient from "./RpcClient";
 /**
  * Callback with unformatted input
  */
 export interface TCallback {
-    (_err: string, _data: any, _stderr: any): void
+    (_err: string, _data: any): void
 }
 
 /**
@@ -129,19 +130,10 @@ class GarlicoinApi {
      * @param {number} _cacheTime
      */
     call(_command: string, _parameters: ReadonlyArray<any>, _callback: TResponseCallback, _cacheTime: number = 0) {
-        Logger.log("Sent api call:", _command, _parameters);
-        // Init garlicoin-cli
-        let child = require('child_process').execFile;
-        let executablePath: string = "";
-
-        if(!remote.getGlobal('dev')) {
-            executablePath = remote.getGlobal('appPath').replace('app.asar', '');
-        }
-        executablePath += "garlicoin-cli";
+        Logger.log(Logger.LOGLEVEL_DEBUG, "Sent api call:", _command, _parameters);
 
         // Initialise command parameters
         let parameters: Array<string> = [];
-        parameters.push(_command);
         parameters = parameters.concat(_parameters);
 
         // Prepare callback
@@ -152,7 +144,7 @@ class GarlicoinApi {
                 // Cache exists, use cache
                 let response: TApiResponse = (<TCacheEntry>lastCacheEntry).response;
 
-                Logger.log("Api call (cached):", _command, response);
+                Logger.log(Logger.LOGLEVEL_DEBUG, "Api call (cached):", _command, response);
 
                 _callback(response);
                 return;
@@ -163,7 +155,7 @@ class GarlicoinApi {
         encapsulatedCacheCallback = this.encapsulatedCacheCallback(_command, _callback);
 
         // Fetch
-        child(executablePath, parameters, {windowsVerbatimArguments: true}, encapsulatedCacheCallback);
+        RpcClient.call(_command, parameters, encapsulatedCacheCallback);
     }
 
     /**
@@ -297,10 +289,10 @@ class GarlicoinApi {
      * @returns {TCallback}
      */
     encapsulatedCacheCallback(_command: string, _originalCallback: TResponseCallback): TCallback {
-        return (_err: string, _data: any, _stderr: any): void => {
+        return (_err: string, _data: any): void => {
             let response: TApiResponse = this.prepareResponse(_err, _data);
 
-            Logger.log("Api call:", _command, response);
+            Logger.log(Logger.LOGLEVEL_DEBUG, "Api call:", _command, response);
 
             _originalCallback(response);
             response.setCached();
@@ -358,6 +350,7 @@ class GarlicoinApi {
      */
     fetchDaemonStatus = () => {
         this.getBlockChainInfo(this.fetchedDaemonStatus);
+        //setTimeout(this.getBlockChainInfo(this.fetchedDaemonStatus), 100);
     }
 
     /**
@@ -365,25 +358,28 @@ class GarlicoinApi {
      * @param {TApiResponse} _response
      */
     fetchedDaemonStatus = (_response: TApiResponse) => {
-        let error: string = "";
-        if(_response.getError()) {
-            error = _response.getError().message;
+        let errorMessage: string = "";
+        let errorCode: any = 0;
+
+        let error = _response.getError();
+
+        if (error && typeof error == "object") {
+            errorMessage = error.message;
+            errorCode = error.code;
         }
-        if (error && error.indexOf('error code: -28') !== -1) {
-            // Starting up daemon
+
+        if (errorCode == "ECONNREFUSED" || errorCode == -28) {
             this.setDaemonStatus('starting');
             this.fetchDaemonStatus();
-        } else if (error && error.indexOf('couldn\'t connect to server') !== -1) {
-            // Daemon not started at all
+        } else if (errorCode == 'ECONNRESET') {
             this.setDaemonStatus('exited');
-            this.fetchDaemonStatus();
-        } else if (error) {
-            // Unknown error
-            Logger.log('Got error from GarlicoinApi', _response.getError());
+            Logger.log(Logger.LOGLEVEL_ERROR, 'Daemon exited unexpectedly')
+        } else if (errorCode) {
+            Logger.log(Logger.LOGLEVEL_WARNING, errorMessage, errorCode);
         } else {
             // Check if daemon is fetching or ready
             let graceBlockDiff = 50;
-            let blockChain: TBlockChainInfo = _response.getJson() as any;
+            let blockChain: TBlockChainInfo = _response.getData();
             if(blockChain.blocks + graceBlockDiff < blockChain.headers || blockChain.headers == 0) {
                 this.setDaemonStatus('fetching');
                 this.fetchingStatus = blockChain;

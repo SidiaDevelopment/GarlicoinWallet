@@ -38,8 +38,8 @@ class AccountStore {
      * @param {TApiResponse} _response
      */
     receiveAccounts = (_response: TApiResponse) => {
-        this.balanceByAccount = _response.getJson();
-        this.accounts = Object.keys(_response.getJson());
+        this.balanceByAccount = _response.getData();
+        this.accounts = Object.keys(_response.getData());
         this.fetchAddresses();
         this.runningRequests = this.runningRequests.filter((_val: string) => {
             return _val != '*';
@@ -65,7 +65,7 @@ class AccountStore {
      */
     fetchedAddressesByAccount = (_account: string) => {
         return (_response: TApiResponse) => {
-            this.wallet[_account] = _response.getJson() as any;
+            this.wallet[_account] = _response.getData();
             this.runningRequests = this.runningRequests.filter((_val: string) => {
                 return _val != _account;
             });

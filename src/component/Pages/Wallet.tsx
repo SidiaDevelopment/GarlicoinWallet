@@ -80,7 +80,7 @@ class Wallet extends React.Component<TWalletProps, TWalletState> {
     fetchedTransactions = (response: TApiResponse) => {
         let transactions: TTransactionData[] = [];
         let key = 1;
-        transactions = transactions.concat(response.getJson() as any);
+        transactions = transactions.concat(response.getData());
         transactions = transactions.map((_value: TTransactionData) => {
             _value.key = key++;
             return _value;

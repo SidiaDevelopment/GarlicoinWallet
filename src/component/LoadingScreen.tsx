@@ -50,7 +50,10 @@ class LoadingScreen extends React.Component<TLoadingScreenProps, TLoadingScreenS
                <div>
                    {
                        GarlicoinApi.getDaemonStatus() == 'fetching' ?
-                           <Progress type="circle" percent={Math.round((blockChainInfo.blocks / blockChainInfo.headers) * 100)} /> :
+                           <Progress type="circle" percent={blockChainInfo.headers != 0 ?
+                                Math.round((blockChainInfo.blocks / blockChainInfo.headers) * 100) :
+                                0
+                           } /> :
                            <Icon type="loading" className="loadingSpinner" spin />
                    }
                </div>
