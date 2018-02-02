@@ -41,7 +41,7 @@ OR (for the developers)
 #### Test build
 * Pack all files with `npm run build` use `npm run dev` if you want to repackage after each change
 * To start the app use `npm run start`
-* Make sure that, while testing in `client/main.js` `const dev` is always set to false
+* Make sure that, while testing in `client/main.js` `const dev` is always set to true while developing
 * If you want to see the loading screen set `const demo` in `client/main.js` to true
 
 #### Production build
